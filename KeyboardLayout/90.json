@@ -1,0 +1,10 @@
+{
+  "keys": [
+    ["[ESC]", "[F1]", "[F2]", "[F3]", "[F4]","[F5]", "[F6]", "[F7]", "[F8]", "[F9]","[F10]", "[F11]", "[F12]","[ScrLk]","[PrtSC]","[Pause]","[Insert]"],
+    ["~`", "!1", "@2", "#3", "$4", "%5", "^6", "&7", "*8", "(9", ")0", "_-", "+=", "[BACKSPACE]","[Home]","[End]"],
+    ["[TAB]", "Qq", "Ww", "Ee", "Rr", "Tt", "Yy", "Uu", "Ii", "Oo", "Pp", "{[", "}]", "|\\","[Delete]","[PgUp]"],
+    ["[CAPSLOCK]", "Aa", "Ss", "Dd", "Ff", "Gg", "Hh", "Jj", "Kk", "Ll", ":;", "\"'", "[ENTER]", "", "[PgDn]"],
+    ["[SHIFT]", "Zz", "Xx", "Cc", "Vv", "Bb", "Nn", "Mm", "<,", ">.", "?/", "[SHIFT_R]", "[UpArrow]"],
+    ["[CTRL]","[FN]","[WIN]", "[ALT]", "[SPACE]", "[ALT_R]", "[wight]", "[CTRL_R]", "", "[LeftArrow]", "[DownArrow]","[RightArrow]"]
+  ]
+}
