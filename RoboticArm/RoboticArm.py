@@ -24,11 +24,15 @@ def ResetToZero():
     time.sleep(0.5)
 
 def GotoZero():
-    if Config.SmartArm == None:
-        Config.SmartArm = ultraArm(CommonHelper.getDeviceName(RoboticArmComName), 115200)
-    Config.SmartArm.go_zero()
-    Config.SmartArm.set_coords(Config.ZERO)
-    time.sleep(1)
+    try:
+        if Config.SmartArm == None:
+            Config.SmartArm = ultraArm(CommonHelper.getDeviceName(RoboticArmComName), 115200)
+        Config.SmartArm.go_zero()
+        Config.SmartArm.set_coords(Config.ZERO)
+        time.sleep(1)
+    except Exception as e:
+        LoggerHelper.app_logger.error('GotoZero() Exception: ' + str(e))
+        
 
 def SetRobotForCutLongKey():
     target_x = 0

@@ -46,7 +46,6 @@ def SlideRailComReceive():
         LoggerHelper.app_logger.error('SlideRailComReceive' + str(e))
         pass
     
-MachinesDistance  = {}
 def ScanAllMachines():
     currentDistance = 0
     # 判断滑轨是否通电
@@ -89,6 +88,7 @@ def ScanMachine():
         SlideRailSerialOpen()    
     moveStepDistance = -10
     sendPreID = -1
+    MachinesDistance = {}
     while abs(moveLength) < abs(Config.SlideTotalLength):
         # => 尝试 先拍一张图片，计算距离，步长二分 
         sendStr = "CJXCGX{}F6000$".format(moveStepDistance)
@@ -162,6 +162,8 @@ def ScanMachine():
              moveStepDistance = -20
         COMM.write(continueRun.encode()) 
     SlideRailSerialClose()
+    LoggerHelper.app_logger.info('Scan Result {}'.format(str(MachinesDistance)))
+
 
 def MoveSlideRail(distance):
     global COMM

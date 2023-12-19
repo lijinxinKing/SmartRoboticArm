@@ -82,7 +82,7 @@ if __name__ == "__main__":
     server.listen()
     BUFFER_SIZE = 1024
     RoboticArm.GotoZero()
-    
+
     while True:
         conn, addr = server.accept()
         try:
@@ -90,7 +90,7 @@ if __name__ == "__main__":
             data = conn.recv(BUFFER_SIZE)
             recv_data = str(data, encoding='utf-8').strip()
         except Exception as e:
-            print(str(e))
+            LoggerHelper.app_logger.info('Recv Data: {}'.format(recv_data))
             continue
 
         print('Recv Data: ', recv_data)
