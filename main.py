@@ -1,4 +1,4 @@
-import numpy as np
+
 import time,socket
 from Config import Config
 from Common import CommonHelper
@@ -6,6 +6,7 @@ from RoboticArm import RoboticArm
 from SmartSlideRail import SmartSlideRail
 from SmartFinger import SmartFinger
 from Logger import LoggerHelper
+
 def handle_scan_machines():
     # 处理 ScanMachines 消息的逻辑
     global resultMsg
@@ -104,8 +105,8 @@ if __name__ == "__main__":
             handle_scan_machines()
         elif 'GoToMachine' in recv_data:
             handle_goto_machine(machine_id,deviceName)
-        elif 'GetImageLayout' in recv_data:
-            handle_get_image_layout(machine_id)
+        # elif 'GetImageLayout' in recv_data:
+        #     handle_get_image_layout(machine_id)
         elif 'SavePressKeys' in recv_data:
             handle_save_press_keys(deviceName)
         elif 'PressKey' in recv_data:
