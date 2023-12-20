@@ -45,11 +45,13 @@ def SlideRailComReceive():
     except Exception as e:
         LoggerHelper.app_logger.error('SlideRailComReceive' + str(e))
         pass
-    
+MachinesDistance = {}
+
 def ScanAllMachines():
     currentDistance = 0
     # 判断滑轨是否通电
     global COMM
+    
     SlideRailSerialClose()
     SlideRailSerialOpen()
     # CJXSA:查询当前坐标,速度等信息
@@ -57,8 +59,8 @@ def ScanAllMachines():
     COMM.write(search_data.encode())
     time.sleep(0.5)
     data = SlideRailComReceive()
-    if data == None: #Not Energized
-        LoggerHelper.app_logger.info('ScanAllMachines 滑轨未通电' )
+    if data == None:
+        LoggerHelper.app_logger.info('ScanAllMachines Slider not powered!' )
         return
     SlideRailSerialClose()
     if os.path.exists(Config.CurrentSlideBarDistanceFile):
@@ -90,7 +92,6 @@ def ScanMachine():
     sendPreID = -1
     MachinesDistance = {}
     while abs(moveLength) < abs(Config.SlideTotalLength):
-        # => 尝试 先拍一张图片，计算距离，步长二分 
         sendStr = "CJXCGX{}F6000$".format(moveStepDistance)
         COMM.write(sendStr.encode())
         waitTime = abs(moveStepDistance / 15) + 1
