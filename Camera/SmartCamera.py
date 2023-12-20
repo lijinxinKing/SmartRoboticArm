@@ -42,24 +42,17 @@ getMachineAprilTag = []
 def RestartCameraExe():
     from Common import CommonHelper
     result = CommonHelper.ClickTaskBar()
-    if result == False:
-        desktop_path = os.path.join(os.path.expanduser("~"), "Desktop")
-        print(desktop_path)
-        exe_path = desktop_path + "\\" + "Camera.exe"
-        subprocess.Popen(exe_path)
-        time.sleep(3)
-        os.system("c:\\windows\\System32\\taskkill /F /IM Camera.exe")
-        time.sleep(3)
-    # desktop_path = os.path.join(os.path.expanduser("~"), "Desktop")
-    # exe_path = desktop_path + "\\" + "Camera.exe"
-    # if os.path.exists(exe_path) == False:
-    #     current_directory = os.path.dirname(os.path.abspath(__file__))
-    #     parent_directory = os.path.dirname(current_directory)
-    #     exe_path = os.path.join(parent_directory, "Camera.exe")
-    # subprocess.Popen(exe_path)
-    # time.sleep(3)
-    # os.system("c:\\windows\\System32\\taskkill /F /IM Camera.exe")
-    # time.sleep(3)
+    LoggerHelper.app_logger.info('Click TaskBar {}'.format(result))
+    current_directory = os.path.dirname(os.path.abspath(__file__))    
+    exe_path = current_directory + "\\" + "Camera.exe"
+    if os.path.exists(exe_path) == False:
+        current_directory = os.path.dirname(os.path.abspath(__file__))
+        parent_directory = os.path.dirname(current_directory)
+        exe_path = os.path.join(parent_directory, "Camera.exe")
+    subprocess.Popen(exe_path)
+    time.sleep(3)
+    os.system("c:\\windows\\System32\\taskkill /F /IM Camera.exe")
+    time.sleep(3)
 
 def get_camera_frame():
     initialize_camera()
@@ -253,6 +246,8 @@ def GetAllAprilTag(tagCount):
     from RoboticArm import RoboticArm
     if currentDistance < 200:
         RoboticArm.ResetToZero()
+        from Common import CommonHelper
+        CommonHelper.ClickTaskBar()
         cap = cv2.VideoCapture(1,cv2.CAP_DSHOW)
         cap.set(3,Config.resolutionRatio_Width) #设置分辨率
         cap.set(4,Config.resolutionRatio_Height)
@@ -401,5 +396,10 @@ def GetCalibration():
         i = i + 1
     return getAllTags
 
+def is_blurry(image, threshold=100):
+    gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
+    laplacian_var = cv2.Laplacian(gray, cv2.CV_64F).var()
+    return laplacian_var < threshold
+
 if __name__=="__main__":
-    GetColorLocation('Green')
+    pass

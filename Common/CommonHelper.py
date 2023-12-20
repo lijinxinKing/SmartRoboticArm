@@ -54,38 +54,37 @@ def GetKeyboardLocation(machine_id, keyboardCode):
     frame = None
 
     SmartCamera.RestartCameraExe()
+    current_directory = os.path.dirname(os.path.abspath(__file__))    
+    parent_directory = os.path.dirname(current_directory)  # 获取当前目录的父目录
+    target_path = 'KeyboardLayout\\Keyboard_layout_{}.jpg'.format(str(machine_id))
+    target_path = os.path.join(parent_directory,target_path)
+
     Config.Camera = cv2.VideoCapture(1, cv2.CAP_DSHOW)
     Config.Camera.set(3, Config.resolutionRatio_Width)
     Config.Camera.set(4, Config.resolutionRatio_Height)
     cv2.waitKey(1500)
-    for i in range(0, 5):
-        if Config.Camera == None:
+    for i in range(0, 5): 
+        ret, frame = Config.Camera.read()
+        if ret == False or frame is None:
+            SmartCamera.RestartCameraExe()
             Config.Camera = cv2.VideoCapture(1, cv2.CAP_DSHOW)
             Config.Camera.set(3, Config.resolutionRatio_Width)
             Config.Camera.set(4, Config.resolutionRatio_Height)
             cv2.waitKey(1500)
             ret, frame = Config.Camera.read()
-            if ret == True and frame != None:
-                break
-        else:   
-            ret, frame = Config.Camera.read()
-            if ret == False:
-                Config.Camera = cv2.VideoCapture(1, cv2.CAP_DSHOW)
-                cv2.waitKey(1500)
-                ret, frame = Config.Camera.read()
-                if ret != False:
-                    break
+            if ret == False or frame is None:
+                continue
+        else:
+            if os.path.exists(target_path):
+                os.remove(target_path)
+            cv2.imwrite(target_path, frame)
+            image = cv2.imread(target_path)
+            if SmartCamera.is_blurry(image):
+                LoggerHelper.app_logger.info("is blurry")
             else:
+                LoggerHelper.app_logger.info("is clear")
                 break
-    current_directory = os.path.dirname(os.path.abspath(__file__))    
-    parent_directory = os.path.dirname(current_directory)  # 获取当前目录的父目录
 
-    target_path = 'KeyboardLayout\\Keyboard_layout_{}.jpg'.format(str(machine_id))
-    target_path = os.path.join(parent_directory,target_path)
-    if os.path.exists(target_path):
-        os.remove(target_path)
-
-    cv2.imwrite(target_path, frame)
     data = None
     with open(target_path, "rb") as f:
         tk = f.read()
@@ -146,7 +145,7 @@ def ClickTaskBar():
             print((top_left[0] + width,top_left[1] + height))
             pyautogui.click(top_left[0] + width,top_left[1] + height)
             time.sleep(10)
-            LoggerHelper.app_logger.info("点击taskbar 成功！")
+            LoggerHelper.app_logger.info("Click taskbar succefully")
             if check_process_exists("Camera.exe"):
                 os.system("c:\\windows\\System32\\taskkill /F /IM Camera.exe")
             else:
@@ -302,4 +301,4 @@ def GetRowColByKeyName(key_name,machineIndex):
 if __name__ == '__main__':
     from RoboticArm import RoboticArm
     #RoboticArm.GotoZero()
-    GetMaxRowCol('5')
+    GetKeyboardLocation('7','7')

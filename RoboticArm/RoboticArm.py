@@ -247,7 +247,7 @@ def PressKey(keyName,machine_id,PlanId,deviceName,pressTimes,SaveLocation = Fals
     min_moveX = green_moveX - (key_y - min_y) / ratio + move_h/2 / ratio
 
     if offset_moveX < min_moveX:
-        LoggerHelper.app_logger.error('达到限位 目标值 {} ，最小值 {}'.format(offset_moveX,min_moveX))
+        LoggerHelper.app_logger.error('reach the limit {} ，min {}'.format(offset_moveX,min_moveX))
         from RoboticArm import RoboticArm
         RoboticArm.GotoZero()
         return 'Press {} Failed'.format(keyName)
@@ -256,7 +256,7 @@ def PressKey(keyName,machine_id,PlanId,deviceName,pressTimes,SaveLocation = Fals
     min_moveY = green_moveY + (min_x - center_Key_x) / ratio
     max_moveY = green_moveY + (max_x - center_Key_x) / ratio
     if offset_moveY > max_moveY or offset_moveY < min_moveY:
-        LoggerHelper.app_logger.error('达到限位 目标值{} ，最值 Max {}, Min {}'.format(offset_moveY,max_moveY,min_moveY))
+        LoggerHelper.app_logger.error('reach the limit {} ， Max {}, Min {}'.format(offset_moveY,max_moveY,min_moveY))
         from RoboticArm import RoboticArm
         RoboticArm.GotoZero()
         return 'Press {} Failed'.format(keyName)

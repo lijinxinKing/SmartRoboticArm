@@ -45,7 +45,7 @@ def SlideRailComReceive():
     except Exception as e:
         LoggerHelper.app_logger.error('SlideRailComReceive' + str(e))
         pass
-    
+MachinesDistance = {}  
 def ScanAllMachines():
     currentDistance = 0
     # 判断滑轨是否通电
@@ -58,7 +58,7 @@ def ScanAllMachines():
     time.sleep(0.5)
     data = SlideRailComReceive()
     if data == None: #Not Energized
-        LoggerHelper.app_logger.info('ScanAllMachines 滑轨未通电' )
+        LoggerHelper.app_logger.info('ScanAllMachines Slider not powered on' )
         return
     SlideRailSerialClose()
     if os.path.exists(Config.CurrentSlideBarDistanceFile):

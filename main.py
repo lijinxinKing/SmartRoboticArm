@@ -70,6 +70,7 @@ def handle_press_key(deviceName):
         if "times=" in recv_data:
             pressTimes = recv_data.split('=')[1]
             resultMsg = RoboticArm.PressKey(secondKey,machine_id,PlanId,deviceName,pressTimes)
+            time.sleep(int(pressTimes))
     SmartFinger.ReleaseSmartFingure(fingerDisplayName)
 
 if __name__ == "__main__":
