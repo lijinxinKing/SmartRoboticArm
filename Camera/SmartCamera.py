@@ -252,16 +252,21 @@ def GetAllAprilTag(tagCount):
         cap.set(3,Config.resolutionRatio_Width) #设置分辨率
         cap.set(4,Config.resolutionRatio_Height)
         cv2.waitKey(1000)
+    # 在循环外部创建 AprilTag 检测器
+    try:
+        at_detector = apriltag.Detector(families='tag36h11')
+    except Exception as e:
+        print(e)
     while flag and checkTinmes >0:
         ret, frame = cap.read()
         img = frame
         gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
         # 创建一个apriltag检测器
-        at_detector = None       
-        try:
-            at_detector = apriltag.Detector(families='tag36h11')
-        except Exception as e:
-            print(e)
+        if at_detector == None:     
+            try:
+                at_detector = apriltag.Detector(families='tag36h11')
+            except Exception as e:
+                print(e)
             continue
         # at_detector = apriltag.Detector(families='tag36h11 tag25h9')  #for windows
         # 进行apriltag检测，得到检测到的apriltag的列表

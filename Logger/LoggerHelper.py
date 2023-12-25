@@ -2,7 +2,7 @@ import logging
 import os.path
 import time
 
-def setup_logger(log_file, log_level=logging.DEBUG):
+def setup_logger(log_file, log_level=logging.INFO):
     logger = logging.getLogger()
     logger.setLevel(log_level)
     log_path = os.path.dirname(os.path.abspath(log_file))
@@ -14,8 +14,16 @@ def setup_logger(log_file, log_level=logging.DEBUG):
     logger.addHandler(file_handler)
     return logger
 
-log_file_name = "Logs/robot_log.log"
-app_logger = setup_logger(log_file_name)
+log_file_name = ""
+app_logger = setup_logger("Logs/robot_{}.log".format(log_file_name))
+
+def change_log_file(logger, new_log_file):
+    for handler in logger.handlers:
+        if isinstance(handler, logging.FileHandler):
+            handler.close()
+            logger.removeHandler(handler)
+    log_file_name = "Logs/robot_{}.log".format(new_log_file)
+    return setup_logger(log_file_name, logger.getEffectiveLevel())
 
 if __name__ == "__main__":
     log_file_name = "Logs/robot_log.log"

@@ -35,28 +35,35 @@ def getDeviceName(comName):
             print('{} Com Name {}'.format(comName,deviceName))
     return deviceName
 
+CenterKey_location = {}
+
 def GetKeyLocationFromRedis(planId,deviceName,KeyValue):
     try:
+        key = planId + ":" + deviceName + "," + str(KeyValue)
+        location = CenterKey_location.get(key)
+        if location != None:
+            return location
         pool = redis.ConnectionPool(host='10.119.96.35',port=6379,password='',db=4)  
         r = redis.Redis(connection_pool=pool)
-        key = planId + ":" + deviceName + "," + str(KeyValue)
         data = r.get(key)
         if data == None:
             key = planId + ":" + deviceName + "," + str(KeyValue).upper()
             data = r.get(key)
         if data !=None:
-            return json.loads(data)
+            value = json.loads(data)
+            CenterKey_location[key] = value
+            return value
     except Exception as e:
         LoggerHelper.app_logger.error(str(e))
     return None
 
-def GetKeyboardLocation(machine_id, keyboardCode):
+def GetKeyboardLocation(machine_id, keyboardCode,PlanId):
     frame = None
 
     SmartCamera.RestartCameraExe()
     current_directory = os.path.dirname(os.path.abspath(__file__))    
     parent_directory = os.path.dirname(current_directory)  # 获取当前目录的父目录
-    target_path = 'KeyboardLayout\\Keyboard_layout_{}.jpg'.format(str(machine_id))
+    target_path = 'KeyboardLayout\\{}\\Keyboard_layout_{}.jpg'.format(PlanId,str(machine_id))
     target_path = os.path.join(parent_directory,target_path)
 
     Config.Camera = cv2.VideoCapture(1, cv2.CAP_DSHOW)
@@ -91,7 +98,7 @@ def GetKeyboardLocation(machine_id, keyboardCode):
         image = base64.b64encode(tk)
         data ={"image": image.decode("utf-8")}
     try:
-        jsonFileName = "KeyboardLayout\\data_{}_temp.json".format(machine_id)
+        jsonFileName = "KeyboardLayout\\{}\\data_{}_temp.json".format(PlanId,machine_id)
         current_directory = os.path.dirname(os.path.abspath(__file__))
         parent_directory = os.path.dirname(current_directory)
         jsonFileName = os.path.join(parent_directory,jsonFileName)
@@ -166,22 +173,22 @@ def check_process_exists(process_name):
             return True
     return False
         
-def GetKeyboardData(fileIndex):
+def GetKeyboardData(fileIndex,PlanId):
     global PictureData
     current_directory = os.path.dirname(os.path.abspath(__file__)) 
-    fileName = "KeyboardLayout\\data_{}_temp.json".format(fileIndex)
+    fileName = "KeyboardLayout\\{}\\data_{}_temp.json".format(PlanId,fileIndex)
     parent_directory = os.path.dirname(current_directory)
     fileName = os.path.join(parent_directory,fileName)
     with open(fileName,"r") as f:
         data = json.load(f)
     PictureData = data
 
-def GetBaseArrowLocation(keyName,layoutId):
+def GetBaseArrowLocation(keyName,layoutId,PlanId):
     arrowKeys = ['UpArrow']
     if  'Arrow' in keyName:
-        cr_x,cr_y,cr_w,cr_h = GetKeyLocation('CTRL_R', layoutId)
+        cr_x,cr_y,cr_w,cr_h = GetKeyLocation('CTRL_R', layoutId,PlanId)
         for key in arrowKeys:
-         arrow_Location = GetKeyLocation(key, layoutId)
+         arrow_Location = GetKeyLocation(key, layoutId,PlanId)
          if arrow_Location  != None:
             l_x,l_y,l_w,l_h = arrow_Location
             if l_x > cr_x:
@@ -195,8 +202,8 @@ def GetBaseArrowLocation(keyName,layoutId):
                     arrow_Location = l_x + 40, l_y + 40, cr_w, cr_h
                     return arrow_Location
                 
-def GetKeyLocation(key_name, machine_index):
-    GetKeyboardData(machine_index)
+def GetKeyLocation(key_name, machine_index,PlanId):
+    GetKeyboardData(machine_index,PlanId)
     layout_data = PictureData["data"]
     variations = [
         key_name,
@@ -218,12 +225,12 @@ def GetKeyLocation(key_name, machine_index):
             return key_location
     return None
 
-def GetAllKeysLocation():
-    GetKeyboardData(machineIndex)
-    layout_data = PictureData["data"]
-    return layout_data
+# def GetAllKeysLocation():
+#     GetKeyboardData(machineIndex)
+#     layout_data = PictureData["data"]
+#     return layout_data
 
-def GetKeyNameRowCol(i,j,machineIndex):
+def GetKeyNameRowCol(i,j,machineIndex,PlanId):
     current_directory = os.path.dirname(os.path.abspath(__file__))
     parent_directory = os.path.dirname(current_directory)
     fileName = "KeyboardLayout\\{}.json".format(machineIndex)
@@ -242,7 +249,7 @@ def GetKeyNameRowCol(i,j,machineIndex):
         return None
     return index_key_Data[i][j]
 
-def get_boundary_value(machineIndex):
+def get_boundary_value(machineIndex,PlanId):
     current_directory = os.path.dirname(os.path.abspath(__file__))
     parent_directory = os.path.dirname(current_directory)
     fileName = "KeyboardLayout\\{}.json".format(machineIndex)
@@ -256,16 +263,16 @@ def get_boundary_value(machineIndex):
     firstKey = index_key_Data[0][0]
     col_count = len(index_key_Data[0])
     firstRow_lastCol = index_key_Data[0][col_count-1]
-    min_x = GetKeyLocation(firstKey,machineIndex)[0]
-    min_y_1 = GetKeyLocation(firstKey,machineIndex)[1]
-    max_x = GetKeyLocation(firstRow_lastCol,machineIndex)[0]
-    min_y_2 = GetKeyLocation(firstRow_lastCol,machineIndex)[1]
+    min_x = GetKeyLocation(firstKey,machineIndex,PlanId)[0]
+    min_y_1 = GetKeyLocation(firstKey,machineIndex,PlanId)[1]
+    max_x = GetKeyLocation(firstRow_lastCol,machineIndex,PlanId)[0]
+    min_y_2 = GetKeyLocation(firstRow_lastCol,machineIndex,PlanId)[1]
     min_y = min_y_1
     if min_y < min_y_2:
         min_y = min_y_2
     return (min_x,max_x,min_y)
 
-def GetRowColByKeyName(key_name,machineIndex):
+def GetRowColByKeyName(key_name,machineIndex,PlanId):
     current_directory = os.path.dirname(os.path.abspath(__file__))
     parent_directory = os.path.dirname(current_directory)
     fileName = "KeyboardLayout\\{}.json".format(machineIndex)

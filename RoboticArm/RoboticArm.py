@@ -132,6 +132,7 @@ def PressKey(keyName,machine_id,PlanId,deviceName,pressTimes,SaveLocation = Fals
                 time.sleep(0.5)
             #Config.SmartArm.set_coords(ZERO, 40)
         resultMsg = 'Press {} Successful'.format(keyName)    
+        print(resultMsg)
         return 'Press {} Successful'.format(keyName)
    
     ratio = Config.machine_ratio.get(machine_id)
@@ -144,6 +145,8 @@ def PressKey(keyName,machine_id,PlanId,deviceName,pressTimes,SaveLocation = Fals
         Config.machine_ratio[machine_id] = ratio
         
     if center_Key_location is None:
+        print('PressKey {} center_Key_location is None'.format(center_Key))
+        LoggerHelper.app_logger.debug('PressKey {} center_Key_location is None'.format(center_Key))
         (Green_MaxX, Green_MaxY, Green_MaxW,Green_MaxH) = SmartCamera.GetColorLocation('Green')
         green_key_cx = Green_MaxX + Green_MaxW/2
         green_key_cy = Green_MaxY - Green_MaxH/2
@@ -194,27 +197,27 @@ def PressKey(keyName,machine_id,PlanId,deviceName,pressTimes,SaveLocation = Fals
         insteadOfSpace = True
     
     if 'DownArrow' in keyName:
-        arrowLocation = CommonHelper.GetBaseArrowLocation(keyName,machine_id)
+        arrowLocation = CommonHelper.GetBaseArrowLocation(keyName,machine_id,PlanId)
         key_location_in_pic = arrowLocation
     elif 'UpArrow' in keyName:
-        key_x, key_y, key_w, key_h = CommonHelper.GetKeyLocation(keyName, machine_id)
+        key_x, key_y, key_w, key_h = CommonHelper.GetKeyLocation(keyName, machine_id,PlanId)
         if key_h > 60 :
             key_h = 40
         key_location_in_pic = key_x, key_y, key_w, key_h
     else:
-        key_location_in_pic = CommonHelper.GetKeyLocation(keyName, machine_id)
+        key_location_in_pic = CommonHelper.GetKeyLocation(keyName, machine_id,PlanId)
 
     key_x, key_y, key_w, key_h = key_location_in_pic
-    center_Key_i, center_Key_j = CommonHelper.GetRowColByKeyName(center_Key, layoutId)
+    center_Key_i, center_Key_j = CommonHelper.GetRowColByKeyName(center_Key, layoutId,PlanId)
     target_Key_i = 0
     target_Key_j = 0
-    target_key_row_col =  CommonHelper.GetRowColByKeyName(keyName, layoutId)
+    target_key_row_col =  CommonHelper.GetRowColByKeyName(keyName, layoutId,PlanId)
     if target_key_row_col != None:
         target_Key_i = target_key_row_col[0]
         target_Key_j = target_key_row_col[1]
 
-    same_row_key_name = CommonHelper.GetKeyNameRowCol(target_Key_i, center_Key_j, layoutId)
-    same_row_result = CommonHelper.GetKeyLocation(same_row_key_name, machine_id)
+    same_row_key_name = CommonHelper.GetKeyNameRowCol(target_Key_i, center_Key_j, layoutId,PlanId)
+    same_row_result = CommonHelper.GetKeyLocation(same_row_key_name, machine_id,PlanId)
  
     print("################# Press Step #######################")
     if key_location_in_pic != None:
@@ -241,7 +244,7 @@ def PressKey(keyName,machine_id,PlanId,deviceName,pressTimes,SaveLocation = Fals
         offset_x = 0
         offset_y = 0
 
-    min_x,max_x,min_y = CommonHelper.get_boundary_value(machine_id)
+    min_x,max_x,min_y = CommonHelper.get_boundary_value(machine_id,PlanId)
    
     offset_moveX = green_moveX - offset_y # 控制机械臂上下移动
     min_moveX = green_moveX - (key_y - min_y) / ratio + move_h/2 / ratio

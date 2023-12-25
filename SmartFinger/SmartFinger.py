@@ -84,9 +84,12 @@ def ClickBegin(arg):
             button_width, button_height = button_size['width'], button_size['height']
             button_area = screenshot[button_y:button_y + button_height, button_x:button_x + button_width]
             average_color_per_row = np.average(button_area, axis=0)
-            average_color = np.average(average_color_per_row, axis=0)  
-            if(sum(average_color) > color_threshold): #已经按下
-                TouchAction(Config.AndroidDriver).tap(target_button).perform()
+            average_color = np.average(average_color_per_row, axis=0)
+            sumcolor = sum(average_color)
+            print('sum color {}'.format(sumcolor))
+            if(sumcolor > color_threshold): #已经按下
+                #TouchAction(Config.AndroidDriver).tap(target_button).perform()
+                target_button.click()
                 time.sleep(1)
             print('Smart Finger Run Succeed ！')
             return True
