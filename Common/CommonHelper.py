@@ -225,10 +225,51 @@ def GetKeyLocation(key_name, machine_index,PlanId):
             return key_location
     return None
 
-# def GetAllKeysLocation():
-#     GetKeyboardData(machineIndex)
-#     layout_data = PictureData["data"]
-#     return layout_data
+# 上传图片 进行分割
+def GetAllKeysLocation(machine_id,PlanId):
+    pictureServerKey =  "SmartPictureServer"
+    pool = redis.ConnectionPool(host='10.119.96.35',port=6379,password='',db=4)  
+    r = redis.Redis(connection_pool=pool)
+    data = r.get(pictureServerKey)
+    if data == None:
+        r.set("SmartPictureServer","Busy")
+    else:
+        if str(data) == "Busy":
+            while True:
+                time.sleep(5)
+                data = r.get(pictureServerKey)
+                if str(data) != "Busy":
+                    break
+
+    layoutId = Config.Machine_Code_Dic.get(machine_id)
+    if layoutId == None:
+        layoutId = machine_id
+    current_directory = os.path.dirname(os.path.abspath(__file__))
+    parent_directory = os.path.dirname(current_directory)
+    keyboard_path = 'KeyboardLayout\\{}'.format(PlanId)
+    target_path = os.path.join(parent_directory,keyboard_path)
+    if not os.path.exists(target_path):
+        try:
+            os.makedirs(target_path)
+            print(f"the folder '{target_path}' create successfully")
+            LoggerHelper.app_logger.info(f"the folder '{target_path}' create successfully")
+        except OSError as e:
+            LoggerHelper.app_logger.info(f"create folder Failed: {e}")
+            return f"create folder failed: {e}"
+    else:
+        print(f"the folder '{target_path}' already exists")
+
+    keyboard_path = 'KeyboardLayout\\{}\\data_{}_temp.json'.format(PlanId,str(machine_id))
+    target_path = os.path.join(parent_directory,keyboard_path)
+    if os.path.exists(target_path):
+        return '{} already exists'.format(target_path)
+    sendImageResult = GetKeyboardLocation(machine_id,layoutId,PlanId)
+    if sendImageResult:
+        resultMsg = 'Send Image Result Successful'
+    else:
+        resultMsg = 'Send Image Result Failed'
+    r.set("SmartPictureServer","idle")
+    return resultMsg
 
 def GetKeyNameRowCol(i,j,machineIndex,PlanId):
     current_directory = os.path.dirname(os.path.abspath(__file__))
@@ -308,4 +349,4 @@ def GetRowColByKeyName(key_name,machineIndex,PlanId):
 if __name__ == '__main__':
     from RoboticArm import RoboticArm
     #RoboticArm.GotoZero()
-    GetKeyboardLocation('7','7')
+    GetAllKeysLocation('7','7')

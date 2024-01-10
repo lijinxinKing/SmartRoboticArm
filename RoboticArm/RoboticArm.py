@@ -30,7 +30,9 @@ def GotoZero():
         Config.SmartArm.go_zero()
         Config.SmartArm.set_coords(Config.ZERO)
         time.sleep(1)
+
     except Exception as e:
+        print(str(e))
         LoggerHelper.app_logger.error('GotoZero() Exception: ' + str(e))
         
 
@@ -100,6 +102,8 @@ def SetRobotForCutLongKey():
 
 def PressKey(keyName,machine_id,PlanId,deviceName,pressTimes,SaveLocation = False):
     global resultMsg
+    if Config.SmartArm == None:
+        Config.SmartArm = ultraArm(CommonHelper.getDeviceName(RoboticArmComName), 115200)
     coords = Config.SmartArm.get_coords_info()
     layoutId = Config.Machine_Code_Dic.get(machine_id)
     center_Key = Config.Machines_center.get(machine_id)
@@ -121,7 +125,7 @@ def PressKey(keyName,machine_id,PlanId,deviceName,pressTimes,SaveLocation = Fals
     if target_Key_location == None and upArrow_location != None:
         target_Key_location = [upArrow_location[0]-15,upArrow_location[1],upArrow_location[2]]
     if target_Key_location != None:
-        moveCoords_key = [target_Key_location[0],target_Key_location[1],float(target_Key_location[2]) + 10]
+        moveCoords_key = [target_Key_location[0],target_Key_location[1],float(target_Key_location[2]) + 15]
         if SaveLocation == False:
             for i in range(0,int(pressTimes)):
                 Config.SmartArm.set_coords(moveCoords_key,50)
@@ -337,5 +341,5 @@ def PressKey(keyName,machine_id,PlanId,deviceName,pressTimes,SaveLocation = Fals
     return 'Press {} Successful'.format(keyName)
 
 if __name__=="__main__":
-    ResetToZero()
-    SetRobotForCutLongKey()
+    GotoZero()
+    #SetRobotForCutLongKey()
